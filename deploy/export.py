@@ -3,7 +3,6 @@ from ultralytics.nn.modules import Attention
 from ultralytics.engine.exporter import Exporter, try_export, arange_patch
 from ultralytics.utils import LOGGER, __version__, colorstr
 from ultralytics.utils.checks import check_requirements
-from ultralytics.utils.torch_utils import get_latest_opset
 import torch
 import onnx
 from nn.modules import ESPDetect
@@ -52,7 +51,7 @@ class ESP_Detect_Exporter(Exporter):
             requirements += ["onnxsim", "onnxruntime" + ("-gpu" if torch.cuda.is_available() else "")]
         check_requirements(requirements)
 
-        opset_version = self.args.opset or get_latest_opset()
+        opset_version = 13 # esp-ppq default 18
         LOGGER.info(f"\n{prefix} starting export with onnx {onnx.__version__} opset {opset_version}...")
         f = str(self.file.with_suffix(".onnx"))
         output_names = ["box0", "score0", "box1", "score1", "box2", "score2"]

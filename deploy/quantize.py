@@ -1,6 +1,6 @@
 import os
-from ppq import QuantizationSettingFactory
-from ppq.api import espdl_quantize_onnx
+from esp_ppq import QuantizationSettingFactory
+from esp_ppq.api import espdl_quantize_onnx
 from torch.utils.data import DataLoader
 import torch
 from torch.utils.data import Dataset
@@ -84,7 +84,7 @@ def quant_espdet(onnx_path, target, num_of_bits, device, batchsz, imgsz, calib_d
         collate_fn=collate_fn,
         setting=quant_setting,
         device=device,
-        error_report=False,
+        error_report=True,
         skip_export=False,
         export_test_values=False,
         verbose=0,
