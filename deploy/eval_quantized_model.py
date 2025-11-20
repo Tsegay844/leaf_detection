@@ -20,9 +20,9 @@ from ultralytics.utils.torch_utils import (
     smart_inference_mode,
 )
 
-from ppq.api import load_native_graph, espdl_quantize_onnx
-from ppq.executor import TorchExecutor
-from ppq import QuantizationSettingFactory
+from esp_ppq.api import load_native_graph, espdl_quantize_onnx
+from esp_ppq.executor import TorchExecutor
+from esp_ppq import QuantizationSettingFactory
 from nn.modules.esp_head import ESPDetect
 from nn.modules import *
 
