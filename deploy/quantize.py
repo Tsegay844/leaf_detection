@@ -95,12 +95,12 @@ def quant_espdet(onnx_path, target, num_of_bits, device, batchsz, imgsz, calib_d
 
 if __name__ == "__main__":
     quant_espdet(
-        onnx_path="espdet_pico_320_320_grape_leaf.onnx",
+        onnx_path="espdet_pico_320_256_grape_leaf.onnx",
         target="esp32s3",
         num_of_bits=8,
         device='cpu',
-        batchsz=32,
-        imgsz=320,
+        batchsz=1,  # Must match ONNX batch (1 for rect models)
+        imgsz=(256, 320),  # [h, w] - both divisible by 32
         calib_dir="deploy/grape_leaf_calib",
-        espdl_model_path="espdet_pico_320_320_grape_leaf.espdl",
+        espdl_model_path="espdet_pico_320_256_grape_leaf.espdl",
     )
