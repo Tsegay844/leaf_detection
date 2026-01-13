@@ -15,14 +15,21 @@ from ultralytics.utils import LOGGER, TQDM, callbacks, colorstr, emojis
 from ultralytics.utils.checks import check_imgsz
 from ultralytics.utils.ops import Profile
 from ultralytics.utils.torch_utils import (
-    de_parallel,
     select_device,
     smart_inference_mode,
 )
 
+# de_parallel removed in newer ultralytics versions
+try:
+    from ultralytics.utils.torch_utils import de_parallel
+except ImportError:
+    de_parallel = lambda x: x  # Use model directly if de_parallel not available
+
 from esp_ppq.api import load_native_graph, espdl_quantize_onnx
 from esp_ppq.executor import TorchExecutor
 from esp_ppq import QuantizationSettingFactory
+import sys
+sys.path.insert(0, '..')
 from nn.modules.esp_head import ESPDetect
 from nn.modules import *
 
@@ -57,11 +64,11 @@ def quant(imgsz):
     BATCH_SIZE = 32
     INPUT_SHAPE = [3, *imgsz] if isinstance(imgsz, (list, tuple)) else [3, imgsz, imgsz]
     DEVICE = "cpu"
-    TARGET = "esp32p4"
+    TARGET = "esp32s3"
     NUM_OF_BITS = 8
-    ONNX_PATH = "path/to/your/onnx"
-    ESPDL_MODLE_PATH = "espdet_pico_224_224_mycat.espdl"
-    CALIB_DIR = "path/to/your/calibration/dataset"
+    ONNX_PATH = "../runs/detect/train/weights/best.onnx"
+    ESPDL_MODLE_PATH = "espdet_pico_320_320_grape_leaf.espdl"
+    CALIB_DIR = "grape_leaf_calib"
     
     # load model
     model = onnx.load(ONNX_PATH)
@@ -263,7 +270,7 @@ def make_quant_validator_class(executor):
         def __init__(
             self, dataloader=None, save_dir=None, pbar=None, args=None, _callbacks=None
         ):
-            super().__init__(dataloader, save_dir, pbar, args, _callbacks)
+            super().__init__(args=args, dataloader=dataloader, pbar=pbar, _callbacks=_callbacks)
             self.executor = executor
 
         def __call__(self, trainer=None, model=None):
@@ -307,15 +314,15 @@ def ppq_graph_inference(executor, task, inputs, device):
 
 if __name__ == "__main__":
     # load model.pt to enter val method and thereby run BaseGraph inference
-    model = YOLO("path/to/best.pt")
+    model = YOLO("../runs/detect/train/weights/best.pt")
     # eval quantized model
-    executor = ppq_graph_init(quant, imgsz=224,  device="cpu", native_path=None)
+    executor = ppq_graph_init(quant, imgsz=320,  device="cpu", native_path=None)
     QuantDetectionValidator = make_quant_validator_class(executor)
     results = model.val(
-        data="cfg/datasets/your_yaml_name.yaml",
+        data="../datasets/grape_leaf/data.yaml",
         split="val",
-        imgsz=224,
-        device="cpu",
+        imgsz=320,
+        device="cpu", # is it mandatory to be cpu?
         validator=QuantDetectionValidator,
         save_json=False,
         save=True,

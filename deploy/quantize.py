@@ -95,12 +95,12 @@ def quant_espdet(onnx_path, target, num_of_bits, device, batchsz, imgsz, calib_d
 
 if __name__ == "__main__":
     quant_espdet(
-        onnx_path="espdet_pico_224_224_cat.onnx",
-        target="esp32p4",
+        onnx_path="espdet_pico_320_320_grape_leaf.onnx",
+        target="esp32s3",
         num_of_bits=8,
         device='cpu',
         batchsz=32,
-        imgsz=224,
-        calib_dir="cat_calib",
-        espdl_model_path="espdet_pico_224_224_cat.espdl",
+        imgsz=320,
+        calib_dir="deploy/grape_leaf_calib",
+        espdl_model_path="espdet_pico_320_320_grape_leaf.espdl",
     )
